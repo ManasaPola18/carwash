@@ -12,7 +12,7 @@ public class CarWashService {
 	@Autowired
 	CarWashDAO carWashDAO;
 	
-	public Boolean isValidCustomer(String email, String password) {
+	public String isValidCustomer(String email, String password) {
 		return carWashDAO.isValidUser(email, password);
 	}
 	

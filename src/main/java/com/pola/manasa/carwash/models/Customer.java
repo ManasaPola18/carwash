@@ -8,12 +8,13 @@ public class Customer {
 	public String emailId;
 	public String phNum;
 	public String address;
+	public String userType;
 		
 	public Customer() {
 		super();
 	}
 
-	public Customer(Integer id, String name, String password, String emailId, String phNum, String address) {
+	public Customer(Integer id, String name, String password, String emailId, String phNum, String address, String userType) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -21,6 +22,7 @@ public class Customer {
 		this.emailId = emailId;
 		this.phNum = phNum;
 		this.address = address;
+		this.userType = userType;
 	}
 	
 	public Integer getId() {
@@ -60,6 +62,14 @@ public class Customer {
 		this.address = address;
 	}	
 	
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+
 	@Override
 	public String toString() {
 		return "Customer [id=" + id + ", name=" + name + ", password=" + password + ", emailId=" + emailId + ", phNum="
