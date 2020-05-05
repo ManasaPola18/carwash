@@ -1,5 +1,7 @@
 package com.pola.manasa.carwash.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,4 +22,7 @@ public class CarWashService {
 		return carWashDAO.customerSignUp(customer);
 	}
 	
+	public List<String> getCustomerDetails(String userType){
+		return carWashDAO.getCustomerDetails(userType);
+	}
 }

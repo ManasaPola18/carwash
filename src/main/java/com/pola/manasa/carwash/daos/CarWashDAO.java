@@ -3,6 +3,8 @@ package com.pola.manasa.carwash.daos;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,4 +67,32 @@ public class CarWashDAO {
 		return noOfRowsUpdated > 0;
 	}
 	
+	public List<String> getCustomerDetails(String userType){
+		logger.info("In getCustomerDetails");
+		String sql = "Select EMAIL_ID from customer where USER_TYPE = ?";
+		
+		return jdbcTemplate.execute(sql, new PreparedStatementCallback<List<String>>() {
+			
+			@Override
+			public List<String> doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException {
+				stmt.setString(1,userType);
+				ResultSet rs = stmt.executeQuery();
+				List<String> userList = new ArrayList<>();
+				while(rs.next()) {
+					userList.add(rs.getString(1));
+				}
+				return userList;
+			}
+		});
+
+	}
+	
+	/*
+	 * public List<String> getOrderDetails(String orders){
+	 * logger.info("In getOrderDetails"); String sql = "Select  " }
+	 */
+	
+	
 }
+
+
