@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pola.manasa.carwash.models.CustCarDetails;
 import com.pola.manasa.carwash.models.Customer;
 import com.pola.manasa.carwash.services.CarWashService;
 
@@ -43,4 +44,28 @@ public class CarWashController {
 		return carWashService.getCustomerDetails(userType);
 	}	
 	
+	@RequestMapping(method= RequestMethod.GET, path = "/userdetails")
+	public Customer getUserDetails(@RequestParam String emailId) {
+		return carWashService.getUserDetails(emailId);
+	}
+	
+	@RequestMapping(method= RequestMethod.POST, path = "/addcar")
+	public Boolean addCarDetails(@RequestBody CustCarDetails car) {
+		return carWashService.addCarDetails(car);
+	}
+	
+	@RequestMapping(method= RequestMethod.GET, path = "/cardetails")
+	public CustCarDetails getCarDetails(@RequestParam Integer id) {
+		return carWashService.getCarDetails(id);
+	}
+	
+	@RequestMapping(method= RequestMethod.GET, path = "/cars")
+	public List<CustCarDetails> getListOfCars(@RequestParam Integer custId) {
+		return carWashService.getListOfCars(custId);
+	}
+	
+	@RequestMapping(method= RequestMethod.POST, path="/userdetails")
+	public Boolean updateUserDetails(@RequestBody Customer customer) {
+		return carWashService.updateUserDetails(customer);
+	}
 }
