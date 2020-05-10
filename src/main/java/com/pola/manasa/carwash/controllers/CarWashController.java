@@ -116,4 +116,9 @@ public class CarWashController {
 		return carWashService.getPackages(packageName);
 	}
 	
+	@RequestMapping(method= RequestMethod.GET, path="/getWashCostsByIds")
+	public List<WashCosts> getWashCosts(@RequestParam String id) {
+		return carWashService.getWashCosts(id);
+	}
+	
 }

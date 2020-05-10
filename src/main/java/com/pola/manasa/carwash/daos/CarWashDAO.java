@@ -420,6 +420,29 @@ public class CarWashDAO {
 		});
 	}
 	
+	public List<WashCosts> getWashCosts(String id) {
+		logger.info("In getWashCosts");
+		String sql = "SELECT ID, NAME, COST, TYPE FROM wash_costs where ID in ("+id+")";
+
+		return jdbcTemplate.execute(sql, new PreparedStatementCallback<List<WashCosts>>() {
+
+			@Override
+			public List<WashCosts> doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException {
+			
+				List<WashCosts> list = new ArrayList<>();
+				ResultSet rs = stmt.executeQuery();
+				while(rs.next()) {
+					WashCosts washCost = new WashCosts();
+					washCost.setId(rs.getInt(1));
+					washCost.setName(rs.getString(2));
+					washCost.setCost(rs.getInt(3));
+					washCost.setType(rs.getString(4));
+					list.add(washCost); 
+				}
+				return list;
+			}
+		});
+	}
 }
 
 
