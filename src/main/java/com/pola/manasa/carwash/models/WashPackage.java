@@ -1,11 +1,14 @@
 package com.pola.manasa.carwash.models;
 
+import java.util.List;
+
 public class WashPackage {
 	
 	private Integer id;
 	private Integer serviceId;
 	private String packageName;
-	private String addOnId;
+	private String addOnIds;
+	private List<String> addOnId;
 	private Float totalCost;
 	private Float discount;
 	private Float discountCost;
@@ -21,7 +24,7 @@ public class WashPackage {
 		this.id = id;
 		this.serviceId = serviceId;
 		this.packageName = packageName;
-		this.addOnId = addOnId;
+		//this.addOnId = addOnId;
 		this.totalCost = totalCost;
 		this.discount = discount;
 		this.discountCost = discountCost;
@@ -46,12 +49,11 @@ public class WashPackage {
 	public void setPackageName(String packageName) {
 		this.packageName = packageName;
 	}
-	public String getAddOnId() {
-		return addOnId;
-	}
-	public void setAddOnId(String addOnId) {
-		this.addOnId = addOnId;
-	}
+
+	/*
+	 * public String getAddOnId() { return addOnId; } public void setAddOnId(String
+	 * addOnId) { this.addOnId = addOnId; }
+	 */
 	public Float getTotalCost() {
 		return totalCost;
 	}
@@ -77,6 +79,22 @@ public class WashPackage {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getAddOnIds() {
+		return addOnIds;
+	}
+
+	public void setAddOnIds(String addOnIds) {
+		this.addOnIds = addOnIds;
+	}
+
+	public List<String> getAddOnId() {
+		return addOnId;
+	}
+
+	public void setAddOnId(List<String> addOnId) {
+		this.addOnId = addOnId;
 	}
 	
 	

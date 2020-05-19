@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.pola.manasa.carwash.daos.CarWashDAO;
 import com.pola.manasa.carwash.models.CustCarDetails;
 import com.pola.manasa.carwash.models.Customer;
+import com.pola.manasa.carwash.models.PromoManagement;
 import com.pola.manasa.carwash.models.WashCosts;
 import com.pola.manasa.carwash.models.WashPackage;
 
@@ -88,4 +89,20 @@ public class CarWashService {
 	public List<WashCosts> getWashCosts(String id) {
 		return carWashDAO.getWashCosts(id);
 	}
+	
+	public List<WashPackage> getPackagesById(Integer id) {
+		return carWashDAO.getPackagesById(id);
+	}
+	
+	public List<PromoManagement> getPromoCodes(String promoName){
+		return carWashDAO.getPromoCodes(promoName);
+	}
+	
+	public PromoManagement savePromoCodeDetails(PromoManagement promo) {
+		return carWashDAO.savePromoCodeDetails(promo);
+	}
+	
+	public Boolean updatePromoCodeDetails(PromoManagement promocode) {
+		return carWashDAO.updatePromoCodeDetails(promocode);
+	} 
 }

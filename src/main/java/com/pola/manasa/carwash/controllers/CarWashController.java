@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pola.manasa.carwash.models.CustCarDetails;
 import com.pola.manasa.carwash.models.Customer;
+import com.pola.manasa.carwash.models.PromoManagement;
 import com.pola.manasa.carwash.models.WashCosts;
 import com.pola.manasa.carwash.models.WashPackage;
 import com.pola.manasa.carwash.services.CarWashService;
@@ -26,7 +27,7 @@ public class CarWashController {
 	Logger logger = LoggerFactory.getLogger(CarWashController.class);
 	
 	@Autowired
-	CarWashService carWashService;
+	CarWashService carWashService;	
 	
 	@RequestMapping(method = RequestMethod.GET, path = "/login")
 	public String login(@RequestParam String email, @RequestParam String password) {
@@ -111,9 +112,14 @@ public class CarWashController {
 		return carWashService.updateWashPackageDetails(pack);
 	}
 	
-	@RequestMapping(method= RequestMethod.POST, path="/packagedetails")
-	public List<WashPackage> getPackages(@RequestBody String packageName) {
+	@RequestMapping(method= RequestMethod.GET, path="/packagedetails")
+	public List<WashPackage> getPackages(@RequestParam String packageName) {
 		return carWashService.getPackages(packageName);
+	}
+	
+	@RequestMapping(method= RequestMethod.GET, path="/packagedetailsbyid")
+	public List<WashPackage> getPackagesById(@RequestParam Integer id) { 
+		return carWashService.getPackagesById(id);
 	}
 	
 	@RequestMapping(method= RequestMethod.GET, path="/getWashCostsByIds")
@@ -121,4 +127,19 @@ public class CarWashController {
 		return carWashService.getWashCosts(id);
 	}
 	
+	@RequestMapping(method= RequestMethod.GET,path= "/getPromocodesByName")
+	public List<PromoManagement> getPromoManagement(@RequestParam String promoName){
+		return carWashService.getPromoCodes(promoName);
+	}
+	
+	@RequestMapping(method = RequestMethod.POST,path="/savePromocodes")
+	public PromoManagement savePromoCodeDetails(@RequestBody PromoManagement promo) {
+		logger.info(promo.toString());
+		return carWashService.savePromoCodeDetails(promo);
+	}
+	
+	@RequestMapping(method = RequestMethod.POST,path="/updatepromodetails")
+	public Boolean updatePromoCodeDetails(@RequestBody PromoManagement promocode) {
+		return carWashService.updatePromoCodeDetails(promocode);
+	}
 }

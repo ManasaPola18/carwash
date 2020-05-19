@@ -5,7 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import org.assertj.core.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import com.pola.manasa.carwash.models.CustCarDetails;
 import com.pola.manasa.carwash.models.Customer;
+import com.pola.manasa.carwash.models.PromoManagement;
 import com.pola.manasa.carwash.models.WashCosts;
 import com.pola.manasa.carwash.models.WashPackage;
 
@@ -348,14 +352,16 @@ public class CarWashDAO {
 	public WashPackage saveWashPackageDetails(WashPackage pack) {
 		logger.info("In saveWashPackageDetails");
 		String sql = "INSERT INTO wash_package (SERVICE_ID, PACKAGE_NAME, ADD_ON_IDS, TOTAL_COST, DISCOUNT, DISCOUNTED_COST, STATUS) "
-				+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+				+ " VALUES (?, ?, ?, ?, ?, ?, ?)";
+		
+		
 		int noOfRowsUpdated = jdbcTemplate.execute(sql, new PreparedStatementCallback<Integer>() {
 
 			@Override
 			public Integer doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException {
 				stmt.setInt(1, pack.getServiceId());
 				stmt.setString(2, pack.getPackageName());
-				stmt.setString(3, pack.getAddOnId());
+				stmt.setString(3, pack.getAddOnId().stream().collect(Collectors.joining(",")));
 				stmt.setFloat(4, pack.getTotalCost());
 				stmt.setFloat(5, pack.getDiscount());
 				stmt.setFloat(6, pack.getDiscountCost());
@@ -372,7 +378,7 @@ public class CarWashDAO {
 	public Boolean updateWashPackageDetails(WashPackage pack) {
 		logger.info("In updateWashPackageDetails");
 		String sql = "UPDATE wash_package SET SERVICE_ID = ?, PACKAGE_NAME = ?, ADD_ON_IDS = ?, TOTAL_COST = ?,"
-				+ " DISCOUNT = ?, DISCOUNTED_COST = ? WHERE ID = ?";
+				+ " DISCOUNT = ?, DISCOUNTED_COST = ? ,STATUS = ? WHERE ID = ?";
 		
 		int noOfRowsUpdated = jdbcTemplate.execute(sql, new PreparedStatementCallback<Integer>() {
 
@@ -380,11 +386,12 @@ public class CarWashDAO {
 			public Integer doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException {
 				stmt.setInt(1, pack.getServiceId());
 				stmt.setString(2, pack.getPackageName());
-				stmt.setString(3, pack.getAddOnId());
+				stmt.setString(3, pack.getAddOnId().stream().collect(Collectors.joining(",")));
 				stmt.setFloat(4, pack.getTotalCost());
 				stmt.setFloat(5, pack.getDiscount());
 				stmt.setFloat(6, pack.getDiscountCost());
-				stmt.setInt(7, pack.getId());
+				stmt.setString(7, pack.getStatus());
+				stmt.setInt(8, pack.getId());
 				return stmt.executeUpdate();
 			}
 		});
@@ -392,12 +399,13 @@ public class CarWashDAO {
 	}
 	
 	public List<WashPackage> getPackages(String packageName) {
-		logger.info("In getPackages");
-		String sql = "SELECT ID, SERVICE_ID, PACKAGE_NAME, ADD_ON_IDS, TOTAL_COST, DISCOUNT, DISCOUNTED_COST "
+		logger.info("In getPackages :: "+packageName);
+		String sql = "SELECT ID, SERVICE_ID, PACKAGE_NAME, ADD_ON_IDS, TOTAL_COST, DISCOUNT, DISCOUNTED_COST ,STATUS "
 				+ " FROM wash_package ";
 		if (packageName!= null && packageName != "") {
 			sql+= "where PACKAGE_NAME = '"+packageName+"'";
 		}
+		logger.info("Sql query :: "+sql);
 		return jdbcTemplate.execute(sql, new PreparedStatementCallback<List<WashPackage>>() {
 
 			@Override
@@ -409,10 +417,57 @@ public class CarWashDAO {
 					pack.setId(rs.getInt(1));
 					pack.setServiceId(rs.getInt(2));
 					pack.setPackageName(rs.getString(3));
-					pack.setAddOnId(rs.getString(4));
+					List<String> addonList = new ArrayList<>(); 
+					if (!rs.getString(4).isEmpty()) {
+						String[] arr = rs.getString(4).split(",");
+						for (String str : arr) {
+							addonList.add(str);
+						}
+					}
+					pack.setAddOnId(addonList);
 					pack.setTotalCost(rs.getFloat(5));
 					pack.setDiscount(rs.getFloat(6));
 					pack.setDiscountCost(rs.getFloat(7));
+					pack.setStatus(rs.getString(8));
+
+					packageList.add(pack);
+				}
+				return packageList;
+			}
+		});
+	}
+	
+	public List<WashPackage> getPackagesById(Integer id) {
+		logger.info("In getPackagesById :: "+id);
+		String sql = "SELECT ID, SERVICE_ID, PACKAGE_NAME, ADD_ON_IDS, TOTAL_COST, DISCOUNT, DISCOUNTED_COST ,STATUS "
+				+ " FROM wash_package where ID = ?";
+		
+		logger.info("Sql query :: "+sql);
+		return jdbcTemplate.execute(sql, new PreparedStatementCallback<List<WashPackage>>() {
+
+			@Override
+			public List<WashPackage> doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException {
+				stmt.setInt(1, id);
+				ResultSet rs = stmt.executeQuery();
+				List<WashPackage> packageList = new ArrayList<>();
+				while(rs.next()) {
+					WashPackage pack = new WashPackage();
+					pack.setId(rs.getInt(1));
+					pack.setServiceId(rs.getInt(2));
+					pack.setPackageName(rs.getString(3));
+					List<String> addonList = new ArrayList<>(); 
+					if (!rs.getString(4).isEmpty()) {
+						String[] arr = rs.getString(4).split(",");
+						for (String str : arr) {
+							addonList.add(str);
+						}
+					}
+					pack.setAddOnId(addonList);
+					pack.setTotalCost(rs.getFloat(5));
+					pack.setDiscount(rs.getFloat(6));
+					pack.setDiscountCost(rs.getFloat(7));
+					pack.setStatus(rs.getString(8));
+
 					packageList.add(pack);
 				}
 				return packageList;
@@ -433,7 +488,7 @@ public class CarWashDAO {
 				ResultSet rs = stmt.executeQuery();
 				while(rs.next()) {
 					WashCosts washCost = new WashCosts();
-					washCost.setId(rs.getInt(1));
+					washCost.setId(rs.getInt(1)); 
 					washCost.setName(rs.getString(2));
 					washCost.setCost(rs.getInt(3));
 					washCost.setType(rs.getString(4));
@@ -443,6 +498,80 @@ public class CarWashDAO {
 			}
 		});
 	}
+	
+	public PromoManagement savePromoCodeDetails(PromoManagement promo) {
+		logger.info("In savePromoCodeDetails");
+		String sql = "INSERT INTO promo_management (PROMO_NAME, DISCOUNT_PERCENTAGE, MINIMUM_AMOUNT, MAXIMUM_AMOUNT, STATUS) "
+				+ " VALUES (?, ?, ?, ?, ?)";
+		
+		
+		int noOfRowsUpdated = jdbcTemplate.execute(sql, new PreparedStatementCallback<Integer>() {
+
+			@Override
+			public Integer doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException {
+				stmt.setString(1, promo.getPromoName());
+				stmt.setInt(2, promo.getDiscountPercentage());
+				stmt.setFloat(3, promo.getMinimumAmount());
+				stmt.setFloat(4, promo.getMaximumAmount());
+				stmt.setString(5, promo.getStatus());
+				return stmt.executeUpdate();
+			}
+		});
+		if (noOfRowsUpdated > 0) {
+			return getPromoCodes(promo.getPromoName()).get(0);
+		}
+		return null;
+	}
+	
+
+	public List<PromoManagement> getPromoCodes(String promoName) {
+		logger.info("In getPromoCodes :: "+promoName);
+		String sql = "SELECT ID, PROMO_NAME, DISCOUNT_PERCENTAGE, MINIMUM_AMOUNT, MAXIMUM_AMOUNT, STATUS "
+				+ " FROM promo_management ";
+		if (promoName!= null && promoName != "") {
+			sql+= "where PROMO_NAME = '"+promoName+"'";
+		}
+	
+		logger.info("Sql Query::"+sql);
+		return jdbcTemplate.execute(sql, new PreparedStatementCallback<List<PromoManagement>>() {
+			
+			@Override
+			public List<PromoManagement>  doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException{
+				ResultSet rs = stmt.executeQuery();
+				List<PromoManagement> promoCodes = new ArrayList<>();
+				while(rs.next()) {
+				PromoManagement promo = new PromoManagement();
+					promo.setId(rs.getInt(1));
+					promo.setPromoName(rs.getString(2));
+					promo.setDiscountPercentage(rs.getInt(3));
+					promo.setMinimumAmount(rs.getFloat(4));
+					promo.setMaximumAmount(rs.getFloat(5));
+					promo.setStatus(rs.getString(6));
+					
+					promoCodes.add(promo);
+	
+				}
+				return promoCodes;
+				}
+		});
+		}
+	
+	public Boolean updatePromoCodeDetails(PromoManagement promocode) {
+		logger.info("In updatePromoCodeDetails");
+		String sql = "UPDATE promo_management SET PROMO_NAME = ?, DISCOUNT_PERCENTAGE = ?, MINIMUM_AMOUNT = ?, MAXIMUM_AMOUNT = ?, STATUS = ?" ;
+		int noOfRowsUpdated = jdbcTemplate.execute(sql, new PreparedStatementCallback<Integer>() {
+
+			@Override
+			public Integer doInPreparedStatement(PreparedStatement stmt) throws SQLException, DataAccessException {
+				stmt.setString(1, promocode.getPromoName());
+				stmt.setInt(2, promocode.getDiscountPercentage());
+				stmt.setFloat(3, promocode.getMinimumAmount());
+				stmt.setFloat(4, promocode.getMaximumAmount());
+				stmt.setString(5, promocode.getStatus());
+				return stmt.executeUpdate();
+			}
+		});
+		return noOfRowsUpdated > 0;
+	}
+
 }
-
-
